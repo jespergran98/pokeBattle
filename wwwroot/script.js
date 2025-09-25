@@ -1,15 +1,13 @@
-// Pokemon Battle Game JavaScript - Fixed Version
+// Pokemon Battle Game JavaScript
 class PokemonBattleGame {
     constructor() {
         this.availablePokemon = [];
-        this.cpuPokemon = [];
-        this.selectedPlayerPokemon = null;
-        this.selectedCpuPokemon = null;
-        this.playerPokemon = null;
-        this.cpuPokemonBattle = null;
-        this.currentTurn = 'player';
+        this.selectedPokemon = [];
+        this.gameId = null;
+        this.gameState = null;
         this.isProcessing = false;
-        this.gameOver = false;
+        this.battleLogMessages = [];
+        this.currentLogIndex = 0;
         
         this.init();
     }
@@ -19,200 +17,26 @@ class PokemonBattleGame {
         this.setupEventListeners();
     }
 
-    // Mock Pokemon data since we don't have an API
-    getMockPokemon() {
-        const mockPokemon = [
-            {
-                id: 1,
-                name: "Pikachu",
-                types: ["electric"],
-                spriteUrl: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png",
-                stats: { hp: 100, attack: 55, defense: 40, speed: 90 },
-                moves: [
-                    { name: "Thunder Shock", type: "electric", power: 40, pp: 30, currentPP: 30 },
-                    { name: "Quick Attack", type: "normal", power: 40, pp: 30, currentPP: 30 },
-                    { name: "Thunder", type: "electric", power: 110, pp: 10, currentPP: 10 },
-                    { name: "Agility", type: "psychic", power: 0, pp: 30, currentPP: 30 }
-                ]
-            },
-            {
-                id: 2,
-                name: "Charizard",
-                types: ["fire", "flying"],
-                spriteUrl: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/6.png",
-                stats: { hp: 120, attack: 84, defense: 78, speed: 100 },
-                moves: [
-                    { name: "Flamethrower", type: "fire", power: 90, pp: 15, currentPP: 15 },
-                    { name: "Wing Attack", type: "flying", power: 60, pp: 35, currentPP: 35 },
-                    { name: "Fire Blast", type: "fire", power: 110, pp: 5, currentPP: 5 },
-                    { name: "Slash", type: "normal", power: 70, pp: 20, currentPP: 20 }
-                ]
-            },
-            {
-                id: 3,
-                name: "Blastoise",
-                types: ["water"],
-                spriteUrl: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/9.png",
-                stats: { hp: 130, attack: 83, defense: 100, speed: 78 },
-                moves: [
-                    { name: "Hydro Pump", type: "water", power: 110, pp: 5, currentPP: 5 },
-                    { name: "Water Gun", type: "water", power: 40, pp: 25, currentPP: 25 },
-                    { name: "Ice Beam", type: "ice", power: 90, pp: 10, currentPP: 10 },
-                    { name: "Bite", type: "dark", power: 60, pp: 25, currentPP: 25 }
-                ]
-            },
-            {
-                id: 4,
-                name: "Venusaur",
-                types: ["grass", "poison"],
-                spriteUrl: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/3.png",
-                stats: { hp: 125, attack: 82, defense: 83, speed: 80 },
-                moves: [
-                    { name: "Solar Beam", type: "grass", power: 120, pp: 10, currentPP: 10 },
-                    { name: "Vine Whip", type: "grass", power: 45, pp: 25, currentPP: 25 },
-                    { name: "Sludge Bomb", type: "poison", power: 90, pp: 10, currentPP: 10 },
-                    { name: "Razor Leaf", type: "grass", power: 55, pp: 25, currentPP: 25 }
-                ]
-            },
-            {
-                id: 5,
-                name: "Gengar",
-                types: ["ghost", "poison"],
-                spriteUrl: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/94.png",
-                stats: { hp: 110, attack: 65, defense: 60, speed: 110 },
-                moves: [
-                    { name: "Shadow Ball", type: "ghost", power: 80, pp: 15, currentPP: 15 },
-                    { name: "Lick", type: "ghost", power: 30, pp: 30, currentPP: 30 },
-                    { name: "Hypnosis", type: "psychic", power: 0, pp: 20, currentPP: 20 },
-                    { name: "Night Shade", type: "ghost", power: 60, pp: 15, currentPP: 15 }
-                ]
-            },
-            {
-                id: 6,
-                name: "Alakazam",
-                types: ["psychic"],
-                spriteUrl: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/65.png",
-                stats: { hp: 95, attack: 50, defense: 45, speed: 120 },
-                moves: [
-                    { name: "Psychic", type: "psychic", power: 90, pp: 10, currentPP: 10 },
-                    { name: "Confusion", type: "psychic", power: 50, pp: 25, currentPP: 25 },
-                    { name: "Teleport", type: "psychic", power: 0, pp: 20, currentPP: 20 },
-                    { name: "Recover", type: "normal", power: 0, pp: 10, currentPP: 10 }
-                ]
-            },
-            {
-                id: 7,
-                name: "Machamp",
-                types: ["fighting"],
-                spriteUrl: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/68.png",
-                stats: { hp: 140, attack: 130, defense: 80, speed: 55 },
-                moves: [
-                    { name: "Dynamic Punch", type: "fighting", power: 100, pp: 5, currentPP: 5 },
-                    { name: "Karate Chop", type: "fighting", power: 50, pp: 25, currentPP: 25 },
-                    { name: "Seismic Toss", type: "fighting", power: 60, pp: 20, currentPP: 20 },
-                    { name: "Strength", type: "normal", power: 80, pp: 15, currentPP: 15 }
-                ]
-            },
-            {
-                id: 8,
-                name: "Dragonite",
-                types: ["dragon", "flying"],
-                spriteUrl: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/149.png",
-                stats: { hp: 135, attack: 134, defense: 95, speed: 80 },
-                moves: [
-                    { name: "Dragon Rush", type: "dragon", power: 100, pp: 10, currentPP: 10 },
-                    { name: "Wing Attack", type: "flying", power: 60, pp: 35, currentPP: 35 },
-                    { name: "Hyper Beam", type: "normal", power: 150, pp: 5, currentPP: 5 },
-                    { name: "Thunder", type: "electric", power: 110, pp: 10, currentPP: 10 }
-                ]
-            },
-            {
-                id: 9,
-                name: "Gyarados",
-                types: ["water", "flying"],
-                spriteUrl: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/130.png",
-                stats: { hp: 135, attack: 125, defense: 79, speed: 81 },
-                moves: [
-                    { name: "Hydro Pump", type: "water", power: 110, pp: 5, currentPP: 5 },
-                    { name: "Bite", type: "dark", power: 60, pp: 25, currentPP: 25 },
-                    { name: "Dragon Rage", type: "dragon", power: 40, pp: 10, currentPP: 10 },
-                    { name: "Thrash", type: "normal", power: 120, pp: 10, currentPP: 10 }
-                ]
-            },
-            {
-                id: 10,
-                name: "Lapras",
-                types: ["water", "ice"],
-                spriteUrl: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/131.png",
-                stats: { hp: 160, attack: 85, defense: 80, speed: 60 },
-                moves: [
-                    { name: "Ice Beam", type: "ice", power: 90, pp: 10, currentPP: 10 },
-                    { name: "Surf", type: "water", power: 90, pp: 15, currentPP: 15 },
-                    { name: "Body Slam", type: "normal", power: 85, pp: 15, currentPP: 15 },
-                    { name: "Confuse Ray", type: "ghost", power: 0, pp: 10, currentPP: 10 }
-                ]
-            },
-            {
-                id: 11,
-                name: "Snorlax",
-                types: ["normal"],
-                spriteUrl: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/143.png",
-                stats: { hp: 180, attack: 110, defense: 65, speed: 30 },
-                moves: [
-                    { name: "Body Slam", type: "normal", power: 85, pp: 15, currentPP: 15 },
-                    { name: "Rest", type: "psychic", power: 0, pp: 10, currentPP: 10 },
-                    { name: "Hyper Beam", type: "normal", power: 150, pp: 5, currentPP: 5 },
-                    { name: "Earthquake", type: "ground", power: 100, pp: 10, currentPP: 10 }
-                ]
-            },
-            {
-                id: 12,
-                name: "Mewtwo",
-                types: ["psychic"],
-                spriteUrl: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/150.png",
-                stats: { hp: 130, attack: 110, defense: 90, speed: 130 },
-                moves: [
-                    { name: "Psychic", type: "psychic", power: 90, pp: 10, currentPP: 10 },
-                    { name: "Shadow Ball", type: "ghost", power: 80, pp: 15, currentPP: 15 },
-                    { name: "Aura Sphere", type: "fighting", power: 80, pp: 20, currentPP: 20 },
-                    { name: "Recover", type: "normal", power: 0, pp: 10, currentPP: 10 }
-                ]
-            }
-        ];
-
-        return mockPokemon.map(pokemon => ({
-            ...pokemon,
-            maxHp: pokemon.stats.hp,
-            currentHp: pokemon.stats.hp,
-            isAlive: true
-        }));
-    }
-
     async loadPokemon() {
-        // Since we don't have an API, use mock data
-        this.availablePokemon = this.getMockPokemon();
-        this.generateCpuTeam();
-        this.displayPokemonGrids();
-        this.showScreen('selectionScreen');
+        try {
+            const response = await fetch('/api/pokemon/random');
+            if (response.ok) {
+                this.availablePokemon = await response.json();
+                this.displayPokemonGrid();
+                this.showScreen('selectionScreen');
+            } else {
+                console.error('Failed to load Pokemon');
+            }
+        } catch (error) {
+            console.error('Error loading Pokemon:', error);
+        }
     }
 
-    generateCpuTeam() {
-        // Generate 20 random CPU Pokemon for selection
-        const shuffled = [...this.availablePokemon].sort(() => 0.5 - Math.random());
-        this.cpuPokemon = shuffled.slice(0, 8); // Show 8 for CPU selection
-    }
-
-    displayPokemonGrids() {
-        this.displayPlayerGrid();
-        this.displayCpuGrid();
-    }
-
-    displayPlayerGrid() {
-        const grid = document.getElementById('playerPokemonGrid');
+    displayPokemonGrid() {
+        const grid = document.getElementById('pokemonGrid');
         grid.innerHTML = '';
 
-        // Show first 6 Pokemon for player
-        this.availablePokemon.slice(0, 6).forEach(pokemon => {
+        this.availablePokemon.forEach(pokemon => {
             const card = document.createElement('div');
             card.className = 'pokemon-card';
             card.dataset.pokemonId = pokemon.id;
@@ -227,145 +51,140 @@ class PokemonBattleGame {
                 </div>
             `;
 
-            card.addEventListener('click', () => this.selectPlayerPokemon(pokemon));
+            card.addEventListener('click', () => this.selectPokemon(pokemon));
             grid.appendChild(card);
         });
     }
 
-    displayCpuGrid() {
-        const grid = document.getElementById('cpuPokemonGrid');
-        grid.innerHTML = '';
+    selectPokemon(pokemon) {
+        if (this.selectedPokemon.length >= 3) return;
+        if (this.selectedPokemon.find(p => p.id === pokemon.id)) return;
 
-        this.cpuPokemon.forEach(pokemon => {
-            const card = document.createElement('div');
-            card.className = 'pokemon-card cpu-card';
-            
-            card.innerHTML = `
-                <img src="${pokemon.spriteUrl}" alt="${pokemon.name}" loading="lazy">
-                <div class="name">${pokemon.name}</div>
-                <div class="types">
-                    ${pokemon.types.map(type => 
-                        `<span class="type-badge type-${type}">${type.toUpperCase().slice(0, 3)}</span>`
-                    ).join('')}
-                </div>
-            `;
-
-            grid.appendChild(card);
-        });
-
-        // Auto-select random CPU Pokemon
-        setTimeout(() => {
-            this.selectCpuPokemon();
-        }, 1000);
+        this.selectedPokemon.push(pokemon);
+        this.updateSelectedDisplay();
+        this.updatePokemonCards();
     }
 
-    selectPlayerPokemon(pokemon) {
-        if (this.selectedPlayerPokemon) {
-            // Remove previous selection
-            document.querySelectorAll('.pokemon-card').forEach(card => {
-                card.classList.remove('selected');
-            });
-        }
-
-        this.selectedPlayerPokemon = pokemon;
-        
-        // Update display
-        const card = document.querySelector(`[data-pokemon-id="${pokemon.id}"]`);
-        card.classList.add('selected');
-        
-        this.updatePlayerSelectedDisplay(pokemon);
-        this.checkBattleReady();
-    }
-
-    selectCpuPokemon() {
-        const randomIndex = Math.floor(Math.random() * this.cpuPokemon.length);
-        this.selectedCpuPokemon = this.cpuPokemon[randomIndex];
-        
-        // Highlight selected CPU Pokemon
-        const cpuCards = document.querySelectorAll('#cpuPokemonGrid .pokemon-card');
-        cpuCards.forEach((card, index) => {
-            card.classList.remove('selected');
-            if (index === randomIndex) {
-                card.classList.add('selected');
-            }
-        });
-
-        this.updateCpuSelectedDisplay(this.selectedCpuPokemon);
-        this.checkBattleReady();
-    }
-
-    updatePlayerSelectedDisplay(pokemon) {
-        const display = document.getElementById('playerSelectedPokemon');
-        display.innerHTML = `
-            <img src="${pokemon.spriteUrl}" alt="${pokemon.name}">
-            <div class="selected-info">
-                <div class="name">${pokemon.name}</div>
-                <div class="types">
-                    ${pokemon.types.map(type => 
-                        `<span class="type-badge type-${type}">${type.toUpperCase().slice(0, 3)}</span>`
-                    ).join('')}
-                </div>
-            </div>
-        `;
-    }
-
-    updateCpuSelectedDisplay(pokemon) {
-        const display = document.getElementById('cpuSelectedPokemon');
-        display.innerHTML = `
-            <img src="${pokemon.spriteUrl}" alt="${pokemon.name}">
-            <div class="selected-info">
-                <div class="name">${pokemon.name}</div>
-                <div class="types">
-                    ${pokemon.types.map(type => 
-                        `<span class="type-badge type-${type}">${type.toUpperCase().slice(0, 3)}</span>`
-                    ).join('')}
-                </div>
-            </div>
-        `;
-    }
-
-    checkBattleReady() {
+    updateSelectedDisplay() {
+        const selectedTeam = document.getElementById('selectedTeam');
+        const selectedCount = document.getElementById('selectedCount');
         const startButton = document.getElementById('startBattle');
-        if (this.selectedPlayerPokemon && this.selectedCpuPokemon) {
-            startButton.disabled = false;
+
+        selectedCount.textContent = this.selectedPokemon.length;
+        selectedTeam.innerHTML = '';
+
+        // Create 3 slots
+        for (let i = 0; i < 3; i++) {
+            const slot = document.createElement('div');
+            slot.className = 'team-slot';
+
+            if (i < this.selectedPokemon.length) {
+                const pokemon = this.selectedPokemon[i];
+                slot.className += ' filled';
+                slot.innerHTML = `
+                    <img src="${pokemon.spriteUrl}" alt="${pokemon.name}">
+                    <div class="name">${pokemon.name}</div>
+                `;
+            } else {
+                slot.innerHTML = `<span style="font-size: 0.5rem; color: #999;">Empty</span>`;
+            }
+
+            selectedTeam.appendChild(slot);
+        }
+
+        startButton.disabled = this.selectedPokemon.length < 3;
+    }
+
+    updatePokemonCards() {
+        const cards = document.querySelectorAll('.pokemon-card');
+        cards.forEach(card => {
+            const pokemonId = parseInt(card.dataset.pokemonId);
+            const isSelected = this.selectedPokemon.find(p => p.id === pokemonId);
+            card.classList.toggle('selected', !!isSelected);
+        });
+    }
+
+    async startBattle() {
+        if (this.selectedPokemon.length !== 3) return;
+
+        try {
+            // Generate random CPU team
+            const availableIds = this.availablePokemon.map(p => p.id);
+            const playerIds = this.selectedPokemon.map(p => p.id);
+            const cpuIds = [];
+            
+            while (cpuIds.length < 3) {
+                const randomId = availableIds[Math.floor(Math.random() * availableIds.length)];
+                if (!cpuIds.includes(randomId) && !playerIds.includes(randomId)) {
+                    cpuIds.push(randomId);
+                }
+            }
+
+            const response = await fetch('/api/game/start', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    playerPokemon: playerIds,
+                    cpuPokemon: cpuIds
+                })
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                this.gameId = result.gameId;
+                
+                // Wait for game state to be ready
+                await this.waitForGameReady();
+                this.showScreen('battleScreen');
+            }
+        } catch (error) {
+            console.error('Error starting battle:', error);
         }
     }
 
-    startBattle() {
-        if (!this.selectedPlayerPokemon || !this.selectedCpuPokemon) return;
-
-        // Create battle copies
-        this.playerPokemon = { ...this.selectedPlayerPokemon };
-        this.cpuPokemonBattle = { ...this.selectedCpuPokemon };
+    async waitForGameReady() {
+        let attempts = 0;
+        const maxAttempts = 20;
         
-        // Reset battle state
-        this.currentTurn = 'player';
-        this.gameOver = false;
-        this.isProcessing = false;
-
-        this.showScreen('battleScreen');
-        this.updateBattleDisplay();
-        this.displayBattleMessage(`A wild ${this.cpuPokemonBattle.name} appeared!`);
-        
-        setTimeout(() => {
-            this.displayBattleMessage(`Go ${this.playerPokemon.name}!`);
-            setTimeout(() => {
-                this.displayBattleMessage("What will your Pokémon do?");
-                this.showActionMenu();
-            }, 1500);
-        }, 1500);
+        while (attempts < maxAttempts) {
+            try {
+                const response = await fetch(`/api/game/${this.gameId}`);
+                if (response.ok) {
+                    const gameState = await response.json();
+                    if (gameState.player && gameState.cpu && 
+                        gameState.player.team.length > 0 && gameState.cpu.team.length > 0) {
+                        this.gameState = gameState;
+                        this.updateBattleDisplay();
+                        this.displayBattleMessage("Battle begin!");
+                        return;
+                    }
+                }
+            } catch (error) {
+                console.error('Error checking game state:', error);
+            }
+            
+            attempts++;
+            await new Promise(resolve => setTimeout(resolve, 500));
+        }
     }
 
     updateBattleDisplay() {
+        if (!this.gameState) return;
+
+        const playerPokemon = this.gameState.player.activePokemon || this.gameState.player.team[0];
+        const cpuPokemon = this.gameState.cpu.activePokemon || this.gameState.cpu.team[0];
+
         // Update player Pokemon
-        if (this.playerPokemon) {
-            document.getElementById('playerSprite').src = this.playerPokemon.spriteUrl;
-            document.getElementById('playerName').textContent = this.playerPokemon.name;
+        if (playerPokemon) {
+            document.getElementById('playerSprite').src = playerPokemon.spriteUrl;
+            document.getElementById('playerName').textContent = playerPokemon.name;
             document.getElementById('playerLevel').textContent = 'Lv.50';
-            document.getElementById('playerHpText').textContent = `${this.playerPokemon.currentHp}/${this.playerPokemon.maxHp}`;
+            document.getElementById('playerHpText').textContent = `${playerPokemon.currentHp}/${playerPokemon.maxHp}`;
             
             const playerHpBar = document.getElementById('playerHpBar');
-            const playerHpPercent = (this.playerPokemon.currentHp / this.playerPokemon.maxHp) * 100;
+            const playerHpPercent = (playerPokemon.currentHp / playerPokemon.maxHp) * 100;
             playerHpBar.style.width = `${playerHpPercent}%`;
             
             // Update HP bar color
@@ -374,23 +193,31 @@ class PokemonBattleGame {
             else if (playerHpPercent <= 50) playerHpBar.classList.add('low');
 
             // Update moves
-            this.updateMoveButtons(this.playerPokemon);
+            this.updateMoveButtons(playerPokemon);
         }
 
         // Update CPU Pokemon
-        if (this.cpuPokemonBattle) {
-            document.getElementById('cpuSprite').src = this.cpuPokemonBattle.spriteUrl;
-            document.getElementById('cpuName').textContent = this.cpuPokemonBattle.name;
-            document.getElementById('cpuLevel').textContent = 'Lv.50';
+        if (cpuPokemon) {
+            document.getElementById('enemySprite').src = cpuPokemon.spriteUrl;
+            document.getElementById('enemyName').textContent = cpuPokemon.name;
+            document.getElementById('enemyLevel').textContent = 'Lv.50';
             
-            const cpuHpBar = document.getElementById('cpuHpBar');
-            const cpuHpPercent = (this.cpuPokemonBattle.currentHp / this.cpuPokemonBattle.maxHp) * 100;
-            cpuHpBar.style.width = `${cpuHpPercent}%`;
+            const enemyHpBar = document.getElementById('enemyHpBar');
+            const enemyHpPercent = (cpuPokemon.currentHp / cpuPokemon.maxHp) * 100;
+            enemyHpBar.style.width = `${enemyHpPercent}%`;
             
             // Update HP bar color
-            cpuHpBar.className = 'hp-fill';
-            if (cpuHpPercent <= 20) cpuHpBar.classList.add('critical');
-            else if (cpuHpPercent <= 50) cpuHpBar.classList.add('low');
+            enemyHpBar.className = 'hp-fill';
+            if (enemyHpPercent <= 20) enemyHpBar.classList.add('critical');
+            else if (enemyHpPercent <= 50) enemyHpBar.classList.add('low');
+        }
+
+        // Update switch menu
+        this.updateSwitchMenu();
+
+        // Check if game is over
+        if (this.gameState.status === 1) { // GameOver
+            setTimeout(() => this.showGameOver(), 2000);
         }
     }
 
@@ -415,207 +242,120 @@ class PokemonBattleGame {
         });
     }
 
+    updateSwitchMenu() {
+        const switchList = document.getElementById('switchPokemonList');
+        switchList.innerHTML = '';
+
+        this.gameState.player.team.forEach((pokemon, index) => {
+            if (index === this.gameState.player.activePokemonIndex) return; // Skip active Pokemon
+
+            const switchOption = document.createElement('div');
+            switchOption.className = `switch-pokemon ${!pokemon.isAlive ? 'fainted' : ''}`;
+            switchOption.dataset.pokemonIndex = index;
+
+            switchOption.innerHTML = `
+                <img src="${pokemon.spriteUrl}" alt="${pokemon.name}">
+                <div class="switch-info">
+                    <div class="name">${pokemon.name}</div>
+                    <div class="hp">${pokemon.currentHp}/${pokemon.maxHp} HP</div>
+                </div>
+            `;
+
+            if (pokemon.isAlive) {
+                switchOption.addEventListener('click', () => this.switchPokemon(index));
+            }
+
+            switchList.appendChild(switchOption);
+        });
+    }
+
     async makeMove(moveIndex) {
-        if (this.isProcessing || this.gameOver) return;
+        if (this.isProcessing || !this.gameState) return;
         
         this.isProcessing = true;
         this.hideAllMenus();
 
-        const move = this.playerPokemon.moves[moveIndex];
-        if (move.currentPP <= 0) {
-            this.displayBattleMessage(`${move.name} is out of PP!`);
-            this.isProcessing = false;
-            return;
-        }
+        try {
+            const response = await fetch(`/api/game/${this.gameId}/move`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    attackerId: 'player',
+                    defenderId: 'cpu',
+                    moveIndex: moveIndex
+                })
+            });
 
-        // Player move
-        move.currentPP--;
-        this.displayBattleMessage(`${this.playerPokemon.name} used ${move.name}!`);
-        
-        // Calculate damage
-        const damage = this.calculateDamage(this.playerPokemon, this.cpuPokemonBattle, move);
-        
-        setTimeout(() => {
-            if (damage > 0) {
-                this.cpuPokemonBattle.currentHp = Math.max(0, this.cpuPokemonBattle.currentHp - damage);
-                this.animateAttack('player');
+            if (response.ok) {
+                const result = await response.json();
+                this.gameState = result.gameState;
                 
-                if (this.cpuPokemonBattle.currentHp <= 0) {
-                    this.cpuPokemonBattle.isAlive = false;
-                    setTimeout(() => {
-                        this.displayBattleMessage(`${this.cpuPokemonBattle.name} fainted!`);
-                        this.animateFaint('cpu');
-                        setTimeout(() => {
-                            this.endBattle('player');
-                        }, 2000);
-                    }, 1000);
-                } else {
-                    // CPU's turn
-                    setTimeout(() => {
-                        this.cpuMove();
-                    }, 1500);
-                }
-            } else {
-                this.displayBattleMessage(`It had no effect...`);
-                setTimeout(() => {
-                    this.cpuMove();
-                }, 1500);
-            }
-            
-            this.updateBattleDisplay();
-        }, 1000);
-    }
-
-    cpuMove() {
-        if (this.gameOver) return;
-
-        // CPU selects random move
-        const availableMoves = this.cpuPokemonBattle.moves.filter(move => move.currentPP > 0);
-        if (availableMoves.length === 0) {
-            this.displayBattleMessage(`${this.cpuPokemonBattle.name} has no moves left!`);
-            this.endBattle('player');
-            return;
-        }
-
-        const randomMove = availableMoves[Math.floor(Math.random() * availableMoves.length)];
-        randomMove.currentPP--;
-        
-        this.displayBattleMessage(`${this.cpuPokemonBattle.name} used ${randomMove.name}!`);
-        
-        const damage = this.calculateDamage(this.cpuPokemonBattle, this.playerPokemon, randomMove);
-        
-        setTimeout(() => {
-            if (damage > 0) {
-                this.playerPokemon.currentHp = Math.max(0, this.playerPokemon.currentHp - damage);
-                this.animateAttack('cpu');
+                // Process battle log messages
+                this.processBattleLog();
                 
-                if (this.playerPokemon.currentHp <= 0) {
-                    this.playerPokemon.isAlive = false;
-                    setTimeout(() => {
-                        this.displayBattleMessage(`${this.playerPokemon.name} fainted!`);
-                        this.animateFaint('player');
-                        setTimeout(() => {
-                            this.endBattle('cpu');
-                        }, 2000);
-                    }, 1000);
-                } else {
-                    // Player's turn
-                    setTimeout(() => {
-                        this.displayBattleMessage("What will your Pokémon do?");
-                        this.showActionMenu();
-                        this.isProcessing = false;
-                    }, 1500);
-                }
-            } else {
-                this.displayBattleMessage(`It had no effect...`);
+                // Update display after messages
                 setTimeout(() => {
-                    this.displayBattleMessage("What will your Pokémon do?");
-                    this.showActionMenu();
+                    this.updateBattleDisplay();
                     this.isProcessing = false;
+                    
+                    if (this.gameState.status !== 1 && this.gameState.currentTurn === 'player') {
+                        this.showActionMenu();
+                    }
+                }, 2000);
+            }
+        } catch (error) {
+            console.error('Error making move:', error);
+            this.isProcessing = false;
+        }
+    }
+
+    async switchPokemon(pokemonIndex) {
+        if (this.isProcessing || !this.gameState) return;
+        
+        this.isProcessing = true;
+        this.hideAllMenus();
+
+        try {
+            const response = await fetch(`/api/game/${this.gameId}/switch`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    playerId: 'player',
+                    pokemonIndex: pokemonIndex
+                })
+            });
+
+            if (response.ok) {
+                this.gameState = await response.json();
+                this.processBattleLog();
+                
+                setTimeout(() => {
+                    this.updateBattleDisplay();
+                    this.isProcessing = false;
+                    this.showActionMenu();
                 }, 1500);
             }
-            
-            this.updateBattleDisplay();
-        }, 1000);
+        } catch (error) {
+            console.error('Error switching Pokemon:', error);
+            this.isProcessing = false;
+        }
     }
 
-    calculateDamage(attacker, defender, move) {
-        if (move.power === 0) return 0; // Status move
+    processBattleLog() {
+        const logContent = document.querySelector('.log-content');
         
-        // Simple damage calculation
-        const attack = attacker.stats.attack;
-        const defense = defender.stats.defense;
-        const power = move.power;
-        
-        // Base damage formula (simplified)
-        let damage = Math.floor(((2 * 50 + 10) / 250) * (attack / defense) * power + 2);
-        
-        // Add some randomness (85-100%)
-        const randomFactor = (Math.random() * 0.15) + 0.85;
-        damage = Math.floor(damage * randomFactor);
-        
-        // Type effectiveness (simplified)
-        const effectiveness = this.getTypeEffectiveness(move.type, defender.types);
-        damage = Math.floor(damage * effectiveness);
-        
-        return Math.max(1, damage);
-    }
-
-    getTypeEffectiveness(attackType, defenderTypes) {
-        // Simplified type chart
-        const typeChart = {
-            fire: { grass: 2, water: 0.5, fire: 0.5 },
-            water: { fire: 2, grass: 0.5, water: 0.5 },
-            grass: { water: 2, fire: 0.5, grass: 0.5 },
-            electric: { water: 2, flying: 2, grass: 0.5, electric: 0.5 },
-            psychic: { fighting: 2, poison: 2, psychic: 0.5 },
-            ghost: { psychic: 2, ghost: 2, normal: 0 },
-            fighting: { normal: 2, psychic: 0.5, ghost: 0 },
-            poison: { grass: 2, poison: 0.5, psychic: 0.5 },
-            flying: { grass: 2, fighting: 2, electric: 0.5 },
-            ice: { grass: 2, flying: 2, water: 0.5 },
-            dragon: { dragon: 2 },
-            dark: { psychic: 2, ghost: 2, fighting: 0.5 },
-            normal: {}
-        };
-
-        let effectiveness = 1;
-        
-        defenderTypes.forEach(defType => {
-            if (typeChart[attackType] && typeChart[attackType][defType] !== undefined) {
-                effectiveness *= typeChart[attackType][defType];
-            }
-        });
-
-        return effectiveness;
-    }
-
-    animateAttack(attacker) {
-        const sprite = attacker === 'player' ? 
-            document.getElementById('playerSprite') : 
-            document.getElementById('cpuSprite');
-        
-        sprite.classList.add('attack-animation');
-        setTimeout(() => {
-            sprite.classList.remove('attack-animation');
-        }, 300);
-
-        // Damage flash on defender
-        const defenderSprite = attacker === 'player' ? 
-            document.getElementById('cpuSprite') : 
-            document.getElementById('playerSprite');
-        
-        defenderSprite.classList.add('damage-animation');
-        setTimeout(() => {
-            defenderSprite.classList.remove('damage-animation');
-        }, 500);
-    }
-
-    animateFaint(pokemon) {
-        const sprite = pokemon === 'player' ? 
-            document.getElementById('playerSprite') : 
-            document.getElementById('cpuSprite');
-        
-        sprite.classList.add('faint-animation');
-    }
-
-    endBattle(winner) {
-        this.gameOver = true;
-        
-        const gameOverTitle = document.getElementById('gameOverTitle');
-        const gameOverMessage = document.getElementById('gameOverMessage');
-        
-        if (winner === 'player') {
-            gameOverTitle.textContent = 'Victory!';
-            gameOverMessage.textContent = 'You defeated the CPU trainer!';
-        } else {
-            gameOverTitle.textContent = 'Defeat...';
-            gameOverMessage.textContent = 'The CPU trainer won this time.';
+        if (this.gameState.battleLog.length > 0) {
+            const latestMessages = this.gameState.battleLog.slice(-3); // Show last 3 messages
+            logContent.innerHTML = latestMessages.map(msg => `<p>${msg}</p>`).join('');
         }
         
-        setTimeout(() => {
-            this.showScreen('gameOverScreen');
-        }, 1000);
+        // Auto-scroll to bottom
+        const battleLog = document.getElementById('battleLog');
+        battleLog.scrollTop = battleLog.scrollHeight;
     }
 
     displayBattleMessage(message) {
@@ -624,15 +364,32 @@ class PokemonBattleGame {
     }
 
     showActionMenu() {
-        if (this.gameOver) return;
+        if (this.gameState.status === 1) return; // Don't show menu if game is over
         
         document.getElementById('actionMenu').style.display = 'block';
         document.getElementById('moveMenu').classList.add('hidden');
+        document.getElementById('switchMenu').classList.add('hidden');
     }
 
     hideAllMenus() {
         document.getElementById('actionMenu').style.display = 'none';
         document.getElementById('moveMenu').classList.add('hidden');
+        document.getElementById('switchMenu').classList.add('hidden');
+    }
+
+    showGameOver() {
+        const gameOverTitle = document.getElementById('gameOverTitle');
+        const gameOverMessage = document.getElementById('gameOverMessage');
+        
+        if (this.gameState.winner === 'player') {
+            gameOverTitle.textContent = 'Victory!';
+            gameOverMessage.textContent = 'You defeated the CPU trainer!';
+        } else {
+            gameOverTitle.textContent = 'Defeat...';
+            gameOverMessage.textContent = 'The CPU trainer won this time.';
+        }
+        
+        this.showScreen('gameOverScreen');
     }
 
     showScreen(screenId) {
@@ -646,29 +403,16 @@ class PokemonBattleGame {
     }
 
     resetGame() {
-        this.selectedPlayerPokemon = null;
-        this.selectedCpuPokemon = null;
-        this.playerPokemon = null;
-        this.cpuPokemonBattle = null;
-        this.currentTurn = 'player';
+        this.selectedPokemon = [];
+        this.gameId = null;
+        this.gameState = null;
         this.isProcessing = false;
-        this.gameOver = false;
+        this.battleLogMessages = [];
+        this.currentLogIndex = 0;
         
-        // Reset all Pokemon to full health and PP
-        this.availablePokemon.forEach(pokemon => {
-            pokemon.currentHp = pokemon.maxHp;
-            pokemon.isAlive = true;
-            pokemon.moves.forEach(move => {
-                move.currentPP = move.pp;
-            });
-        });
-
-        this.generateCpuTeam();
-        this.displayPokemonGrids();
-        this.showScreen('selectionScreen');
-        
-        // Reset button states
-        document.getElementById('startBattle').disabled = true;
+        this.updateSelectedDisplay();
+        this.updatePokemonCards();
+        this.loadPokemon();
     }
 
     setupEventListeners() {
@@ -688,6 +432,11 @@ class PokemonBattleGame {
             document.getElementById('moveMenu').classList.remove('hidden');
         });
 
+        document.getElementById('pokemonBtn').addEventListener('click', () => {
+            document.getElementById('actionMenu').style.display = 'none';
+            document.getElementById('switchMenu').classList.remove('hidden');
+        });
+
         // Move buttons
         document.querySelectorAll('.move-btn').forEach((button, index) => {
             button.addEventListener('click', () => {
@@ -695,23 +444,28 @@ class PokemonBattleGame {
             });
         });
 
-        // Back button
+        // Back buttons
         document.getElementById('moveBackBtn').addEventListener('click', () => {
             document.getElementById('moveMenu').classList.add('hidden');
             this.showActionMenu();
         });
 
+        document.getElementById('switchBackBtn').addEventListener('click', () => {
+            document.getElementById('switchMenu').classList.add('hidden');
+            this.showActionMenu();
+        });
+
         // Battle log click to continue
         document.getElementById('battleLog').addEventListener('click', () => {
-            if (this.isProcessing || this.gameOver) return;
-            if (this.currentTurn === 'player') {
+            if (this.isProcessing) return;
+            if (this.gameState && this.gameState.currentTurn === 'player' && this.gameState.status !== 1) {
                 this.showActionMenu();
             }
         });
 
         // Keyboard controls
         document.addEventListener('keydown', (e) => {
-            if (this.isProcessing || this.gameOver) return;
+            if (this.isProcessing) return;
             
             switch(e.key) {
                 case 'Enter':
@@ -719,7 +473,8 @@ class PokemonBattleGame {
                     e.preventDefault();
                     if (!document.getElementById('actionMenu').style.display || 
                         document.getElementById('actionMenu').style.display !== 'none') {
-                        if (this.currentTurn === 'player') {
+                        // Action menu is visible, trigger first action
+                        if (this.gameState && this.gameState.currentTurn === 'player') {
                             document.getElementById('fightBtn').click();
                         }
                     }
@@ -728,6 +483,8 @@ class PokemonBattleGame {
                     e.preventDefault();
                     if (!document.getElementById('moveMenu').classList.contains('hidden')) {
                         document.getElementById('moveBackBtn').click();
+                    } else if (!document.getElementById('switchMenu').classList.contains('hidden')) {
+                        document.getElementById('switchBackBtn').click();
                     }
                     break;
             }

@@ -31,48 +31,23 @@
     <div id="selectionScreen" class="screen hidden">
         <div class="selection-container">
             <div class="selection-header">
-                <h2>Choose Your Pokémon</h2>
-                <p>Select your fighter and battle begins!</p>
+                <h2>Choose Your Team</h2>
+                <p>Select 3 Pokémon for battle</p>
+                <div class="team-counter">
+                    <span id="selectedCount">0</span>/3 Pokémon selected
+                </div>
             </div>
             
-            <div class="battle-selection">
-                <!-- Player Side -->
-                <div class="player-selection">
-                    <div class="selection-title">
-                        <h3>Player</h3>
-                        <p>Choose your Pokémon</p>
-                    </div>
-                    <div id="playerPokemonGrid" class="pokemon-selection-grid">
-                        <!-- Player Pokemon cards will be populated here -->
-                    </div>
-                    <div class="selected-display">
-                        <div id="playerSelectedPokemon" class="selected-pokemon-display">
-                            <div class="empty-selection">Choose a Pokémon</div>
-                        </div>
-                    </div>
+            <div id="pokemonGrid" class="pokemon-grid">
+                <!-- Pokemon cards will be populated here -->
+            </div>
+            
+            <div class="selected-team">
+                <h3>Your Team</h3>
+                <div id="selectedTeam" class="team-display">
+                    <!-- Selected pokemon will appear here -->
                 </div>
-
-                <!-- VS Divider -->
-                <div class="vs-divider">
-                    <div class="vs-text">VS</div>
-                    <button id="startBattle" class="start-battle-btn" disabled>Battle!</button>
-                </div>
-
-                <!-- CPU Side -->
-                <div class="cpu-selection">
-                    <div class="selection-title">
-                        <h3>CPU</h3>
-                        <p>Random opponent</p>
-                    </div>
-                    <div id="cpuPokemonGrid" class="pokemon-selection-grid">
-                        <!-- CPU Pokemon cards will be populated here -->
-                    </div>
-                    <div class="selected-display">
-                        <div id="cpuSelectedPokemon" class="selected-pokemon-display">
-                            <div class="empty-selection">???</div>
-                        </div>
-                    </div>
-                </div>
+                <button id="startBattle" class="start-battle-btn" disabled>Start Battle!</button>
             </div>
         </div>
     </div>
@@ -80,51 +55,47 @@
     <!-- Battle Screen -->
     <div id="battleScreen" class="screen hidden">
         <div class="battle-container">
-            <!-- CPU Pokemon Area (Top Right) -->
+            <!-- Enemy Pokemon Area -->
             <div class="battlefield-top">
-                <div class="cpu-pokemon-area">
-                    <div class="cpu-platform">
-                        <div class="platform-shadow"></div>
-                    </div>
-                    <div class="cpu-pokemon">
-                        <img id="cpuSprite" class="pokemon-sprite cpu-sprite" src="" alt="CPU Pokemon">
-                        <div class="pokemon-info cpu-info">
-                            <div class="name-level">
-                                <span id="cpuName">???</span>
-                                <span id="cpuLevel">Lv.50</span>
-                            </div>
-                            <div class="hp-bar-container">
-                                <div class="hp-label">HP:</div>
-                                <div class="hp-bar">
-                                    <div id="cpuHpBar" class="hp-fill"></div>
-                                </div>
+                <div class="enemy-platform">
+                    <div class="platform-shadow"></div>
+                </div>
+                <div class="enemy-pokemon">
+                    <img id="enemySprite" class="pokemon-sprite enemy-sprite" src="" alt="Enemy Pokemon">
+                    <div class="pokemon-info enemy-info">
+                        <div class="name-level">
+                            <span id="enemyName">???</span>
+                            <span id="enemyLevel">Lv.50</span>
+                        </div>
+                        <div class="hp-bar-container">
+                            <div class="hp-label">HP:</div>
+                            <div class="hp-bar">
+                                <div id="enemyHpBar" class="hp-fill"></div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Player Pokemon Area (Bottom Left) -->
+            <!-- Player Pokemon Area -->
             <div class="battlefield-bottom">
-                <div class="player-pokemon-area">
-                    <div class="player-platform">
-                        <div class="platform-shadow"></div>
-                    </div>
-                    <div class="player-pokemon">
-                        <img id="playerSprite" class="pokemon-sprite player-sprite" src="" alt="Player Pokemon">
-                        <div class="pokemon-info player-info">
-                            <div class="name-level">
-                                <span id="playerName">???</span>
-                                <span id="playerLevel">Lv.50</span>
+                <div class="player-platform">
+                    <div class="platform-shadow"></div>
+                </div>
+                <div class="player-pokemon">
+                    <img id="playerSprite" class="pokemon-sprite player-sprite" src="" alt="Player Pokemon">
+                    <div class="pokemon-info player-info">
+                        <div class="name-level">
+                            <span id="playerName">???</span>
+                            <span id="playerLevel">Lv.50</span>
+                        </div>
+                        <div class="hp-bar-container">
+                            <div class="hp-label">HP:</div>
+                            <div class="hp-bar">
+                                <div id="playerHpBar" class="hp-fill"></div>
                             </div>
-                            <div class="hp-bar-container">
-                                <div class="hp-label">HP:</div>
-                                <div class="hp-bar">
-                                    <div id="playerHpBar" class="hp-fill"></div>
-                                </div>
-                                <div class="hp-text">
-                                    <span id="playerHpText">0/0</span>
-                                </div>
+                            <div class="hp-text">
+                                <span id="playerHpText">0/0</span>
                             </div>
                         </div>
                     </div>
@@ -148,7 +119,7 @@
                             <span class="btn-icon">⚔️</span>
                             <span class="btn-text">FIGHT</span>
                         </button>
-                        <button class="action-btn pokemon-btn" id="pokemonBtn" disabled>
+                        <button class="action-btn pokemon-btn" id="pokemonBtn">
                             <span class="btn-icon">🎾</span>
                             <span class="btn-text">POKÉMON</span>
                         </button>
@@ -197,6 +168,17 @@
                             </button>
                         </div>
                         <button class="back-btn" id="moveBackBtn">◀ BACK</button>
+                    </div>
+                </div>
+
+                <!-- Pokemon Switch Menu -->
+                <div id="switchMenu" class="switch-menu hidden">
+                    <div class="switch-container">
+                        <h3>Choose a Pokémon</h3>
+                        <div class="switch-pokemon-list" id="switchPokemonList">
+                            <!-- Pokemon switching options will be populated here -->
+                        </div>
+                        <button class="back-btn" id="switchBackBtn">◀ BACK</button>
                     </div>
                 </div>
             </div>
