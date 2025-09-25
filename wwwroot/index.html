@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pokémon Battle Game</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="screen">
+        <div class="loading-content">
+            <div class="title">
+                <h1>POKÉMON</h1>
+                <h2>BATTLE</h2>
+            </div>
+            <div class="pokeball-loader">
+                <div class="pokeball">
+                    <div class="pokeball-top"></div>
+                    <div class="pokeball-bottom"></div>
+                    <div class="pokeball-center">
+                        <div class="pokeball-button"></div>
+                    </div>
+                </div>
+            </div>
+            <p class="loading-text">Loading Pokémon...</p>
+        </div>
+    </div>
+
+    <!-- Team Selection Screen -->
+    <div id="selectionScreen" class="screen hidden">
+        <div class="selection-container">
+            <div class="selection-header">
+                <h2>Choose Your Pokémon</h2>
+                <p>Select your fighter and battle begins!</p>
+            </div>
+            
+            <div class="battle-selection">
+                <!-- Player Side -->
+                <div class="player-selection">
+                    <div class="selection-title">
+                        <h3>Player</h3>
+                        <p>Choose your Pokémon</p>
+                    </div>
+                    <div id="playerPokemonGrid" class="pokemon-selection-grid">
+                        <!-- Player Pokemon cards will be populated here -->
+                    </div>
+                    <div class="selected-display">
+                        <div id="playerSelectedPokemon" class="selected-pokemon-display">
+                            <div class="empty-selection">Choose a Pokémon</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VS Divider -->
+                <div class="vs-divider">
+                    <div class="vs-text">VS</div>
+                    <button id="startBattle" class="start-battle-btn" disabled>Battle!</button>
+                </div>
+
+                <!-- CPU Side -->
+                <div class="cpu-selection">
+                    <div class="selection-title">
+                        <h3>CPU</h3>
+                        <p>Random opponent</p>
+                    </div>
+                    <div id="cpuPokemonGrid" class="pokemon-selection-grid">
+                        <!-- CPU Pokemon cards will be populated here -->
+                    </div>
+                    <div class="selected-display">
+                        <div id="cpuSelectedPokemon" class="selected-pokemon-display">
+                            <div class="empty-selection">???</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Battle Screen -->
+    <div id="battleScreen" class="screen hidden">
+        <div class="battle-container">
+            <!-- CPU Pokemon Area (Top Right) -->
+            <div class="battlefield-top">
+                <div class="cpu-pokemon-area">
+                    <div class="cpu-platform">
+                        <div class="platform-shadow"></div>
+                    </div>
+                    <div class="cpu-pokemon">
+                        <img id="cpuSprite" class="pokemon-sprite cpu-sprite" src="" alt="CPU Pokemon">
+                        <div class="pokemon-info cpu-info">
+                            <div class="name-level">
+                                <span id="cpuName">???</span>
+                                <span id="cpuLevel">Lv.50</span>
+                            </div>
+                            <div class="hp-bar-container">
+                                <div class="hp-label">HP:</div>
+                                <div class="hp-bar">
+                                    <div id="cpuHpBar" class="hp-fill"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Player Pokemon Area (Bottom Left) -->
+            <div class="battlefield-bottom">
+                <div class="player-pokemon-area">
+                    <div class="player-platform">
+                        <div class="platform-shadow"></div>
+                    </div>
+                    <div class="player-pokemon">
+                        <img id="playerSprite" class="pokemon-sprite player-sprite" src="" alt="Player Pokemon">
+                        <div class="pokemon-info player-info">
+                            <div class="name-level">
+                                <span id="playerName">???</span>
+                                <span id="playerLevel">Lv.50</span>
+                            </div>
+                            <div class="hp-bar-container">
+                                <div class="hp-label">HP:</div>
+                                <div class="hp-bar">
+                                    <div id="playerHpBar" class="hp-fill"></div>
+                                </div>
+                                <div class="hp-text">
+                                    <span id="playerHpText">0/0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Battle UI -->
+            <div class="battle-ui">
+                <!-- Battle Log -->
+                <div id="battleLog" class="battle-log">
+                    <div class="log-content">
+                        <p>What will your Pokémon do?</p>
+                    </div>
+                    <div class="continue-arrow" id="continueArrow">▼</div>
+                </div>
+
+                <!-- Action Menu -->
+                <div id="actionMenu" class="action-menu">
+                    <div class="menu-grid">
+                        <button class="action-btn fight-btn" id="fightBtn">
+                            <span class="btn-icon">⚔️</span>
+                            <span class="btn-text">FIGHT</span>
+                        </button>
+                        <button class="action-btn pokemon-btn" id="pokemonBtn" disabled>
+                            <span class="btn-icon">🎾</span>
+                            <span class="btn-text">POKÉMON</span>
+                        </button>
+                        <button class="action-btn bag-btn" disabled>
+                            <span class="btn-icon">🎒</span>
+                            <span class="btn-text">BAG</span>
+                        </button>
+                        <button class="action-btn run-btn" disabled>
+                            <span class="btn-icon">🏃</span>
+                            <span class="btn-text">RUN</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Move Menu -->
+                <div id="moveMenu" class="move-menu hidden">
+                    <div class="moves-container">
+                        <div class="moves-grid">
+                            <button class="move-btn" data-move="0">
+                                <div class="move-info">
+                                    <span class="move-name">Tackle</span>
+                                    <span class="move-type normal">NOR</span>
+                                </div>
+                                <span class="move-pp">PP 35/35</span>
+                            </button>
+                            <button class="move-btn" data-move="1">
+                                <div class="move-info">
+                                    <span class="move-name">Growl</span>
+                                    <span class="move-type normal">NOR</span>
+                                </div>
+                                <span class="move-pp">PP 40/40</span>
+                            </button>
+                            <button class="move-btn" data-move="2">
+                                <div class="move-info">
+                                    <span class="move-name">Ember</span>
+                                    <span class="move-type fire">FIR</span>
+                                </div>
+                                <span class="move-pp">PP 25/25</span>
+                            </button>
+                            <button class="move-btn" data-move="3">
+                                <div class="move-info">
+                                    <span class="move-name">Smokescreen</span>
+                                    <span class="move-type normal">NOR</span>
+                                </div>
+                                <span class="move-pp">PP 20/20</span>
+                            </button>
+                        </div>
+                        <button class="back-btn" id="moveBackBtn">◀ BACK</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Over Screen -->
+    <div id="gameOverScreen" class="screen hidden">
+        <div class="game-over-content">
+            <div class="game-over-animation">
+                <div class="pokeball-final">
+                    <div class="pokeball-top"></div>
+                    <div class="pokeball-bottom"></div>
+                    <div class="pokeball-center">
+                        <div class="pokeball-button"></div>
+                    </div>
+                </div>
+            </div>
+            <h2 id="gameOverTitle">Victory!</h2>
+            <p id="gameOverMessage">You defeated the CPU trainer!</p>
+            <div class="final-buttons">
+                <button id="playAgainBtn" class="play-again-btn">Play Again</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
